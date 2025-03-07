@@ -39,6 +39,4 @@ public class Propriedade {
     public void setPessoas(List<Pessoa> pessoas) {
         this.pessoas = pessoas;
     }
-
-
 }

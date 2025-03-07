@@ -39,6 +39,4 @@ public class Laboratorio {
     public void setPessoas(List<Pessoa> pessoas) {
         this.pessoas = pessoas;
     }
-
-    
 }
