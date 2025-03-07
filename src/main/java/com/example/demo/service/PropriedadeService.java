@@ -2,8 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Propriedade;
 import com.example.demo.repository.PropriedadeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,8 +12,11 @@ import java.util.Optional;
 @Service
 public class PropriedadeService {
 
-    @Autowired
-    private PropriedadeRepository propriedadeRepository;
+    private final PropriedadeRepository propriedadeRepository;
+
+    public PropriedadeService(PropriedadeRepository propriedadeRepository) {
+        this.propriedadeRepository = propriedadeRepository;
+    }
 
     public List<Propriedade> getAllPropriedades() {
         return propriedadeRepository.findAll();
@@ -27,16 +31,18 @@ public class PropriedadeService {
     }
 
     public Propriedade updatePropriedade(Long id, Propriedade propriedadeDetails) {
-        Optional<Propriedade> optionalPropriedade = propriedadeRepository.findById(id);
-        if (optionalPropriedade.isPresent()) {
-            Propriedade propriedade = optionalPropriedade.get();
-            propriedade.setNome(propriedadeDetails.getNome());
-            return propriedadeRepository.save(propriedade);
-        }
-        return null;
+        return propriedadeRepository.findById(id)
+                .map(propriedade -> {
+                    propriedade.setNome(propriedadeDetails.getNome());
+                    return propriedadeRepository.save(propriedade);
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Propriedade não encontrada"));
     }
 
     public void deletePropriedade(Long id) {
+        if (!propriedadeRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Propriedade não encontrada");
+        }
         propriedadeRepository.deleteById(id);
     }
 }

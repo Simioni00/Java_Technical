@@ -7,23 +7,25 @@ import com.example.demo.entity.Laboratorio;
 import com.example.demo.repository.PessoaRepository;
 import com.example.demo.repository.PropriedadeRepository;
 import com.example.demo.repository.LaboratorioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PessoaService {
 
-    @Autowired
-    private PessoaRepository pessoaRepository;
+    private final PessoaRepository pessoaRepository;
+    private final PropriedadeRepository propriedadeRepository;
+    private final LaboratorioRepository laboratorioRepository;
 
-    @Autowired
-    private PropriedadeRepository propriedadeRepository;
-
-    @Autowired
-    private LaboratorioRepository laboratorioRepository;
+    public PessoaService(PessoaRepository pessoaRepository, PropriedadeRepository propriedadeRepository,
+            LaboratorioRepository laboratorioRepository) {
+        this.pessoaRepository = pessoaRepository;
+        this.propriedadeRepository = propriedadeRepository;
+        this.laboratorioRepository = laboratorioRepository;
+    }
 
     public Pessoa createPessoa(PessoaDTO pessoaDTO) {
         Pessoa pessoa = new Pessoa();
@@ -32,11 +34,14 @@ public class PessoaService {
         pessoa.setDataFinal(pessoaDTO.getDataFinal());
         pessoa.setObservacoes(pessoaDTO.getObservacoes());
 
-        Optional<Propriedade> propriedade = propriedadeRepository.findById(pessoaDTO.getPropriedadeId());
-        propriedade.ifPresent(pessoa::setPropriedade);
+        Propriedade propriedade = propriedadeRepository.findById(pessoaDTO.getPropriedadeId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Propriedade não encontrada"));
 
-        Optional<Laboratorio> laboratorio = laboratorioRepository.findById(pessoaDTO.getLaboratorioId());
-        laboratorio.ifPresent(pessoa::setLaboratorio);
+        Laboratorio laboratorio = laboratorioRepository.findById(pessoaDTO.getLaboratorioId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Laboratório não encontrado"));
+
+        pessoa.setPropriedade(propriedade);
+        pessoa.setLaboratorio(laboratorio);
 
         return pessoaRepository.save(pessoa);
     }
@@ -45,31 +50,39 @@ public class PessoaService {
         return pessoaRepository.findAll();
     }
 
-    public Optional<Pessoa> getPessoaById(Long id) {
-        return pessoaRepository.findById(id);
+    public Pessoa getPessoaById(Long id) {
+        return pessoaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
     }
 
     public Pessoa updatePessoa(Long id, PessoaDTO pessoaDTO) {
-        Optional<Pessoa> optionalPessoa = pessoaRepository.findById(id);
-        if (optionalPessoa.isPresent()) {
-            Pessoa pessoa = optionalPessoa.get();
-            pessoa.setNome(pessoaDTO.getNome());
-            pessoa.setDataInicial(pessoaDTO.getDataInicial());
-            pessoa.setDataFinal(pessoaDTO.getDataFinal());
-            pessoa.setObservacoes(pessoaDTO.getObservacoes());
+        return pessoaRepository.findById(id)
+                .map(pessoa -> {
+                    pessoa.setNome(pessoaDTO.getNome());
+                    pessoa.setDataInicial(pessoaDTO.getDataInicial());
+                    pessoa.setDataFinal(pessoaDTO.getDataFinal());
+                    pessoa.setObservacoes(pessoaDTO.getObservacoes());
 
-            Optional<Propriedade> propriedade = propriedadeRepository.findById(pessoaDTO.getPropriedadeId());
-            propriedade.ifPresent(pessoa::setPropriedade);
+                    Propriedade propriedade = propriedadeRepository.findById(pessoaDTO.getPropriedadeId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Propriedade não encontrada"));
 
-            Optional<Laboratorio> laboratorio = laboratorioRepository.findById(pessoaDTO.getLaboratorioId());
-            laboratorio.ifPresent(pessoa::setLaboratorio);
+                    Laboratorio laboratorio = laboratorioRepository.findById(pessoaDTO.getLaboratorioId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Laboratório não encontrado"));
 
-            return pessoaRepository.save(pessoa);
-        }
-        return null;
+                    pessoa.setPropriedade(propriedade);
+                    pessoa.setLaboratorio(laboratorio);
+
+                    return pessoaRepository.save(pessoa);
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
     }
 
     public void deletePessoa(Long id) {
+        if (!pessoaRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada");
+        }
         pessoaRepository.deleteById(id);
     }
 }
