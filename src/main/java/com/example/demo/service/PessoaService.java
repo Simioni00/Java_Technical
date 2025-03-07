@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -50,9 +51,8 @@ public class PessoaService {
         return pessoaRepository.findAll();
     }
 
-    public Pessoa getPessoaById(Long id) {
-        return pessoaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+    public Optional<Pessoa> getPessoaById(Long id) {
+        return pessoaRepository.findById(id);
     }
 
     public Pessoa updatePessoa(Long id, PessoaDTO pessoaDTO) {
