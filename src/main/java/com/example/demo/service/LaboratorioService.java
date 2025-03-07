@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.LaboratorioFilterDTO;
+import com.example.demo.dto.LaboratorioResponseDTO;
 import com.example.demo.entity.Laboratorio;
 import com.example.demo.repository.LaboratorioRepository;
 import org.springframework.http.HttpStatus;
@@ -48,8 +49,8 @@ public class LaboratorioService {
         laboratorioRepository.deleteById(id);
     }
 
-    public List<Laboratorio> findLaboratoriosComFiltros(LaboratorioFilterDTO filtros) {
-        List<Laboratorio> laboratorios = laboratorioRepository.findLaboratoriosComFiltros(
+    public List<LaboratorioResponseDTO> findLaboratoriosComFiltros(LaboratorioFilterDTO filtros) {
+        List<LaboratorioResponseDTO> laboratorios = laboratorioRepository.findLaboratoriosComFiltros(
                 filtros.getDataInicialStart(),
                 filtros.getDataInicialEnd(),
                 filtros.getDataFinalStart(),

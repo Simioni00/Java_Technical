@@ -2,6 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Propriedade;
 import com.example.demo.service.PropriedadeService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +34,14 @@ public class PropriedadeController {
     }
 
     @PostMapping
-    public ResponseEntity<Propriedade> createPropriedade(@RequestBody Propriedade propriedade) {
+    public ResponseEntity<Propriedade> createPropriedade(@Valid @RequestBody Propriedade propriedade) {
         Propriedade createdPropriedade = propriedadeService.createPropriedade(propriedade);
         return ResponseEntity.ok(createdPropriedade);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Propriedade> updatePropriedade(@PathVariable Long id, @RequestBody Propriedade propriedade) {
+    public ResponseEntity<Propriedade> updatePropriedade(@PathVariable Long id,
+            @Valid @RequestBody Propriedade propriedade) {
         Propriedade updatedPropriedade = propriedadeService.updatePropriedade(id, propriedade);
         return updatedPropriedade != null ? ResponseEntity.ok(updatedPropriedade) : ResponseEntity.notFound().build();
     }

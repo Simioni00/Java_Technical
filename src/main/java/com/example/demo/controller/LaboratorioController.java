@@ -1,8 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.LaboratorioFilterDTO;
+import com.example.demo.dto.LaboratorioResponseDTO;
 import com.example.demo.entity.Laboratorio;
 import com.example.demo.service.LaboratorioService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,13 +36,14 @@ public class LaboratorioController {
     }
 
     @PostMapping
-    public ResponseEntity<Laboratorio> createLaboratorio(@RequestBody Laboratorio laboratorio) {
+    public ResponseEntity<Laboratorio> createLaboratorio(@Valid @RequestBody Laboratorio laboratorio) {
         Laboratorio createdLaboratorio = laboratorioService.createLaboratorio(laboratorio);
         return ResponseEntity.ok(createdLaboratorio);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Laboratorio> updateLaboratorio(@PathVariable Long id, @RequestBody Laboratorio laboratorio) {
+    public ResponseEntity<Laboratorio> updateLaboratorio(@PathVariable Long id,
+            @Valid @RequestBody Laboratorio laboratorio) {
         Laboratorio updatedLaboratorio = laboratorioService.updateLaboratorio(id, laboratorio);
         return updatedLaboratorio != null ? ResponseEntity.ok(updatedLaboratorio) : ResponseEntity.notFound().build();
     }
@@ -50,8 +55,8 @@ public class LaboratorioController {
     }
 
     @GetMapping("/filtros")
-    public ResponseEntity<List<Laboratorio>> getLaboratoriosComFiltros(@ModelAttribute LaboratorioFilterDTO filtros) {
-        List<Laboratorio> laboratorios = laboratorioService.findLaboratoriosComFiltros(filtros);
+    public ResponseEntity<List<LaboratorioResponseDTO>> getLaboratoriosComFiltros(@ModelAttribute LaboratorioFilterDTO filtros) {
+        List<LaboratorioResponseDTO> laboratorios = laboratorioService.findLaboratoriosComFiltros(filtros);
         return ResponseEntity.ok(laboratorios);
     }
 }
