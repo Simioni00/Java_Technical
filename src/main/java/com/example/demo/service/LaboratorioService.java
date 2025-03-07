@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.LaboratorioFilterDTO;
 import com.example.demo.entity.Laboratorio;
 import com.example.demo.repository.LaboratorioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,5 +46,17 @@ public class LaboratorioService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Laboratório não encontrado");
         }
         laboratorioRepository.deleteById(id);
+    }
+
+    public List<Laboratorio> findLaboratoriosComFiltros(LaboratorioFilterDTO filtros) {
+        List<Laboratorio> laboratorios = laboratorioRepository.findLaboratoriosComFiltros(
+                filtros.getDataInicialStart(),
+                filtros.getDataInicialEnd(),
+                filtros.getDataFinalStart(),
+                filtros.getDataFinalEnd(),
+                filtros.getObservacoes(),
+                filtros.getQuantidadeMinimaPessoas());
+        
+        return laboratorios != null ? laboratorios : Collections.emptyList();
     }
 }

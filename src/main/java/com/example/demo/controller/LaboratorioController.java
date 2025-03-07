@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.LaboratorioFilterDTO;
 import com.example.demo.entity.Laboratorio;
 import com.example.demo.service.LaboratorioService;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +47,11 @@ public class LaboratorioController {
     public ResponseEntity<Void> deleteLaboratorio(@PathVariable Long id) {
         laboratorioService.deleteLaboratorio(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/filtros")
+    public ResponseEntity<List<Laboratorio>> getLaboratoriosComFiltros(@ModelAttribute LaboratorioFilterDTO filtros) {
+        List<Laboratorio> laboratorios = laboratorioService.findLaboratoriosComFiltros(filtros);
+        return ResponseEntity.ok(laboratorios);
     }
 }
