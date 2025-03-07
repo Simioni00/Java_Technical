@@ -3,6 +3,9 @@ package com.example.demo.controller;
 import com.example.demo.dto.PessoaDTO;
 import com.example.demo.entity.Pessoa;
 import com.example.demo.service.PessoaService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,7 @@ public class PessoaController {
     }
 
     @PostMapping
-    public ResponseEntity<Pessoa> createPessoa(@RequestBody PessoaDTO pessoaDTO) {
+    public ResponseEntity<Pessoa> createPessoa(@Valid @RequestBody PessoaDTO pessoaDTO) {
         Pessoa pessoa = pessoaService.createPessoa(pessoaDTO);
         return ResponseEntity.ok(pessoa);
     }

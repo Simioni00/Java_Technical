@@ -1,14 +1,26 @@
 package com.example.demo.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class PessoaDTO {
 
+    @NotBlank(message = "O nome é obrigatório")
     private String nome;
+
+    @NotNull(message = "A data inicial é obrigatória")
     private LocalDateTime dataInicial;
+
+    @NotNull(message = "A data final é obrigatória")
     private LocalDateTime dataFinal;
+
     private String observacoes;
+
+    @NotNull(message = "O ID da propriedade é obrigatório")
     private Long propriedadeId;
+
+    @NotNull(message = "O ID do laboratório é obrigatório") 
     private Long laboratorioId;
 
     public String getNome() {
