@@ -51,15 +51,6 @@ public class LaboratorioController {
         return ResponseEntity.noContent().build();
     }
 
-    // @GetMapping("/filtros")
-    // public ResponseEntity<List<LaboratorioResponseDTO>>
-    // getLaboratoriosComFiltros(
-    // @ModelAttribute LaboratorioFilterDTO filtros) {
-    // List<LaboratorioResponseDTO> laboratorios =
-    // laboratorioService.findLaboratoriosComFiltros(filtros);
-    // return ResponseEntity.ok(laboratorios);
-    // }
-
     @PostMapping("/filtros")
     public ResponseEntity<List<LaboratorioResponseDTO>> filtrarLaboratorios(
             @Valid @RequestBody LaboratorioFilterDTO filtros) {
