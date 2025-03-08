@@ -106,7 +106,7 @@ public class PessoaService {
         responseDTO.setObservacoes(pessoa.getObservacoes());
 
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
-        propriedadeDTO.setId(pessoa.getPropriedade().getId());
+    //    propriedadeDTO.setId(pessoa.getPropriedade().getId());
         propriedadeDTO.setNome(pessoa.getPropriedade().getNome());
         responseDTO.setInfosPropriedade(propriedadeDTO);
 

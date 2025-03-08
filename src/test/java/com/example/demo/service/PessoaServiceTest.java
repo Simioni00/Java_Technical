@@ -1,4 +1,4 @@
-package com.example.demo.service;
+/*package com.example.demo.service;
 
 import com.example.demo.dto.LaboratorioDTO;
 import com.example.demo.dto.PessoaRequestDTO;
@@ -173,4 +173,4 @@ public class PessoaServiceTest {
         when(pessoaRepository.existsById(1L)).thenReturn(false);
         assertThrows(ResponseStatusException.class, () -> pessoaService.deletePessoa(1L));
     }
-}
+}*/

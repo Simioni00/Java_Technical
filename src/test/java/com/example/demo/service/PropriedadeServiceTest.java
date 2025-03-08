@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.PropriedadeDTO;
+import com.example.demo.dto.PropriedadeResponseDTO;
 import com.example.demo.entity.Propriedade;
 import com.example.demo.repository.PropriedadeRepository;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,14 +31,16 @@ public class PropriedadeServiceTest {
     @Test
     public void testGetAllPropriedades() {
         Propriedade propriedade1 = new Propriedade();
+        propriedade1.setId(1L);
         propriedade1.setNome("Propriedade 1");
 
         Propriedade propriedade2 = new Propriedade();
+        propriedade2.setId(2L);
         propriedade2.setNome("Propriedade 2");
 
         when(propriedadeRepository.findAll()).thenReturn(Arrays.asList(propriedade1, propriedade2));
 
-        List<Propriedade> result = propriedadeService.getAllPropriedades();
+        List<PropriedadeResponseDTO> result = propriedadeService.getAllPropriedades();
         assertEquals(2, result.size());
         assertEquals("Propriedade 1", result.get(0).getNome());
         assertEquals("Propriedade 2", result.get(1).getNome());
@@ -49,48 +54,56 @@ public class PropriedadeServiceTest {
 
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
 
-        Optional<Propriedade> result = propriedadeService.getPropriedadeById(1L);
-        assertTrue(result.isPresent());
-        assertEquals("Propriedade 1", result.get().getNome());
+        PropriedadeResponseDTO result = propriedadeService.getPropriedadeById(1L);
+        assertNotNull(result);
+        assertEquals("Propriedade 1", result.getNome());
     }
 
     @Test
     public void testGetPropriedadeByIdNotFound() {
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<Propriedade> result = propriedadeService.getPropriedadeById(1L);
-        assertFalse(result.isPresent());
+        assertThrows(ResponseStatusException.class, () -> propriedadeService.getPropriedadeById(1L));
     }
 
     @Test
     public void testCreatePropriedade() {
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setNome("Propriedade 1");
+
         Propriedade propriedade = new Propriedade();
-        propriedade.setNome("Propriedade 1");
+        propriedade.setNome(propriedadeDTO.getNome());
 
-        when(propriedadeRepository.save(propriedade)).thenReturn(propriedade);
+        when(propriedadeRepository.save(any(Propriedade.class))).thenReturn(propriedade);
 
-        Propriedade result = propriedadeService.createPropriedade(propriedade);
+        PropriedadeResponseDTO result = propriedadeService.createPropriedade(propriedadeDTO);
         assertEquals("Propriedade 1", result.getNome());
     }
 
     @Test
     public void testUpdatePropriedade() {
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setNome("Propriedade Atualizada");
+
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
         propriedade.setNome("Propriedade 1");
 
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
-        when(propriedadeRepository.save(propriedade)).thenReturn(propriedade);
+        when(propriedadeRepository.save(any(Propriedade.class))).thenReturn(propriedade);
 
-        Propriedade result = propriedadeService.updatePropriedade(1L, propriedade);
-        assertEquals("Propriedade 1", result.getNome());
+        PropriedadeResponseDTO result = propriedadeService.updatePropriedade(1L, propriedadeDTO);
+        assertEquals("Propriedade Atualizada", result.getNome());
     }
 
     @Test
     public void testUpdatePropriedadeNotFound() {
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setNome("Propriedade Atualizada");
+
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> propriedadeService.updatePropriedade(1L, new Propriedade()));
+        assertThrows(ResponseStatusException.class, () -> propriedadeService.updatePropriedade(1L, propriedadeDTO));
     }
 
     @Test

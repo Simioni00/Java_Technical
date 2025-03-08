@@ -1,10 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Propriedade;
+import com.example.demo.dto.PropriedadeDTO;
+import com.example.demo.dto.PropriedadeResponseDTO;
 import com.example.demo.service.PropriedadeService;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,29 +20,24 @@ public class PropriedadeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Propriedade>> getAllPropriedades() {
-        List<Propriedade> propriedades = propriedadeService.getAllPropriedades();
-        return ResponseEntity.ok(propriedades);
+    public ResponseEntity<List<PropriedadeResponseDTO>> getAllPropriedades() {
+        return ResponseEntity.ok(propriedadeService.getAllPropriedades());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Propriedade> getPropriedadeById(@PathVariable Long id) {
-        return propriedadeService.getPropriedadeById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PropriedadeResponseDTO> getPropriedadeById(@PathVariable Long id) {
+        return ResponseEntity.ok(propriedadeService.getPropriedadeById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Propriedade> createPropriedade(@Valid @RequestBody Propriedade propriedade) {
-        Propriedade createdPropriedade = propriedadeService.createPropriedade(propriedade);
-        return ResponseEntity.ok(createdPropriedade);
+    public ResponseEntity<PropriedadeResponseDTO> createPropriedade(@RequestBody @Valid PropriedadeDTO propriedadeDTO) {
+        return ResponseEntity.ok(propriedadeService.createPropriedade(propriedadeDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Propriedade> updatePropriedade(@PathVariable Long id,
-            @Valid @RequestBody Propriedade propriedade) {
-        Propriedade updatedPropriedade = propriedadeService.updatePropriedade(id, propriedade);
-        return updatedPropriedade != null ? ResponseEntity.ok(updatedPropriedade) : ResponseEntity.notFound().build();
+    public ResponseEntity<PropriedadeResponseDTO> updatePropriedade(@PathVariable Long id,
+            @RequestBody @Valid PropriedadeDTO propriedadeDTO) {
+        return ResponseEntity.ok(propriedadeService.updatePropriedade(id, propriedadeDTO));
     }
 
     @DeleteMapping("/{id}")
