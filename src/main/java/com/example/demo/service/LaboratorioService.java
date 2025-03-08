@@ -64,14 +64,12 @@ public class LaboratorioService {
     }
 
     public List<LaboratorioResponseDTO> findLaboratoriosComFiltros(LaboratorioFilterDTO filtros) {
-        List<LaboratorioResponseDTO> laboratorios = laboratorioRepository.findLaboratoriosComFiltros(
+        return laboratorioRepository.findLaboratoriosComFiltros(
                 filtros.getDataInicialStart(),
                 filtros.getDataInicialEnd(),
                 filtros.getDataFinalStart(),
                 filtros.getDataFinalEnd(),
                 filtros.getObservacoes(),
                 filtros.getQuantidadeMinimaPessoas());
-
-        return laboratorios != null ? laboratorios : Collections.emptyList();
     }
 }
