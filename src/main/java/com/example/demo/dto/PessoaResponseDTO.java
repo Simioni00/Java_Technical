@@ -1,35 +1,23 @@
-package com.example.demo.entity;
+package com.example.demo.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
-@Entity
-public class Pessoa {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PessoaResponseDTO {
+
     private Long id;
-
-    @Column(nullable = false)
     private String nome;
-
-    @Column(nullable = false)
     private LocalDateTime dataInicial;
-
-    @Column(nullable = false)
     private LocalDateTime dataFinal;
-
-    @Column(length = 1000)
     private String observacoes;
-
-    @ManyToOne
-    @JoinColumn(name = "propriedade_id", nullable = false)
-    @JsonBackReference
-    private Propriedade propriedade;
+    private PropriedadeDTO infosPropriedade;
+    private LaboratorioDTO laboratorio;
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -64,23 +52,19 @@ public class Pessoa {
         this.observacoes = observacoes;
     }
 
-    public Propriedade getPropriedade() {
-        return propriedade;
+    public PropriedadeDTO getInfosPropriedade() {
+        return infosPropriedade;
     }
 
-    public void setPropriedade(Propriedade propriedade) {
-        this.propriedade = propriedade;
+    public void setInfosPropriedade(PropriedadeDTO infosPropriedade) {
+        this.infosPropriedade = infosPropriedade;
     }
 
-    public Laboratorio getLaboratorio() {
+    public LaboratorioDTO getLaboratorio() {
         return laboratorio;
     }
 
-    public void setLaboratorio(Laboratorio laboratorio) {
+    public void setLaboratorio(LaboratorioDTO laboratorio) {
         this.laboratorio = laboratorio;
     }
-
-    @ManyToOne
-    @JoinColumn(name = "laboratorio_id", nullable = false)
-    private Laboratorio laboratorio;
 }

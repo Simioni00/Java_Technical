@@ -1,11 +1,15 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.PessoaDTO;
+import com.example.demo.dto.PessoaProjectionDTO;
+import com.example.demo.dto.PessoaRequestDTO;
+import com.example.demo.dto.PessoaResponseDTO;
 import com.example.demo.entity.Pessoa;
 import com.example.demo.service.PessoaService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,28 +26,28 @@ public class PessoaController {
     }
 
     @PostMapping
-    public ResponseEntity<Pessoa> createPessoa(@Valid @RequestBody PessoaDTO pessoaDTO) {
-        Pessoa pessoa = pessoaService.createPessoa(pessoaDTO);
-        return ResponseEntity.ok(pessoa);
+    public ResponseEntity<PessoaResponseDTO> createPessoa(@Valid @RequestBody PessoaRequestDTO pessoaRequestDTO) {
+        PessoaResponseDTO responseDTO = pessoaService.createPessoa(pessoaRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<Pessoa>> getAllPessoas() {
-        List<Pessoa> pessoas = pessoaService.getAllPessoas();
+    public ResponseEntity<List<PessoaProjectionDTO>> getAllPessoas() {
+        List<PessoaProjectionDTO> pessoas = pessoaService.getAllPessoasProjected();
         return ResponseEntity.ok(pessoas);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pessoa> getPessoaById(@PathVariable Long id) {
-        return pessoaService.getPessoaById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PessoaResponseDTO> getPessoaById(@PathVariable Long id) {
+        PessoaResponseDTO responseDTO = pessoaService.getPessoaById(id);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pessoa> updatePessoa(@PathVariable Long id, @RequestBody PessoaDTO pessoaDTO) {
-        Pessoa pessoa = pessoaService.updatePessoa(id, pessoaDTO);
-        return pessoa != null ? ResponseEntity.ok(pessoa) : ResponseEntity.notFound().build();
+    public ResponseEntity<PessoaResponseDTO> updatePessoa(@PathVariable Long id,
+            @Valid @RequestBody PessoaRequestDTO pessoaRequestDTO) {
+        PessoaResponseDTO responseDTO = pessoaService.updatePessoa(id, pessoaRequestDTO);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.PessoaDTO;
+import com.example.demo.dto.LaboratorioDTO;
+import com.example.demo.dto.PessoaRequestDTO;
+import com.example.demo.dto.PessoaResponseDTO;
+import com.example.demo.dto.PropriedadeDTO;
 import com.example.demo.entity.Laboratorio;
 import com.example.demo.entity.Pessoa;
 import com.example.demo.entity.Propriedade;
@@ -38,45 +41,65 @@ public class PessoaServiceTest {
 
     @Test
     public void testCreatePessoa() {
-        PessoaDTO pessoaDTO = new PessoaDTO();
-        pessoaDTO.setNome("João Silva");
-        pessoaDTO.setDataInicial(LocalDateTime.now());
-        pessoaDTO.setDataFinal(LocalDateTime.now().plusDays(1));
-        pessoaDTO.setObservacoes("Observação teste");
-        pessoaDTO.setPropriedadeId(1L);
-        pessoaDTO.setLaboratorioId(1L);
+        PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
+        pessoaRequestDTO.setNome("João Silva");
+        pessoaRequestDTO.setDataInicial(LocalDateTime.now());
+        pessoaRequestDTO.setDataFinal(LocalDateTime.now().plusDays(1));
+        pessoaRequestDTO.setObservacoes("Observação teste");
+
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setId(1L);
+        propriedadeDTO.setNome("Fazenda Feliz");
+        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
+
+        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
+        laboratorioDTO.setId(1L);
+        laboratorioDTO.setNome("Laboratório Central");
+        pessoaRequestDTO.setLaboratorio(laboratorioDTO);
 
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
+        propriedade.setNome("Fazenda Feliz");
 
         Laboratorio laboratorio = new Laboratorio();
         laboratorio.setId(1L);
+        laboratorio.setNome("Laboratório Central");
 
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.of(laboratorio));
-        when(pessoaRepository.save(any(Pessoa.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(pessoaRepository.save(any(Pessoa.class))).thenAnswer(invocation -> {
+            Pessoa pessoa = invocation.getArgument(0);
+            return pessoa;
+        });
 
-        Pessoa result = pessoaService.createPessoa(pessoaDTO);
+        PessoaResponseDTO result = pessoaService.createPessoa(pessoaRequestDTO);
         assertEquals("João Silva", result.getNome());
-        assertEquals(propriedade, result.getPropriedade());
-        assertEquals(laboratorio, result.getLaboratorio());
+        assertEquals(1L, result.getInfosPropriedade().getId());
+        assertEquals(1L, result.getLaboratorio().getId());
     }
 
     @Test
     public void testCreatePessoaPropriedadeNotFound() {
-        PessoaDTO pessoaDTO = new PessoaDTO();
-        pessoaDTO.setPropriedadeId(1L);
+        PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setId(1L);
+        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
 
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> pessoaService.createPessoa(pessoaDTO));
+        assertThrows(ResponseStatusException.class, () -> pessoaService.createPessoa(pessoaRequestDTO));
     }
 
     @Test
     public void testCreatePessoaLaboratorioNotFound() {
-        PessoaDTO pessoaDTO = new PessoaDTO();
-        pessoaDTO.setPropriedadeId(1L);
-        pessoaDTO.setLaboratorioId(1L);
+        PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setId(1L);
+        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
+
+        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
+        laboratorioDTO.setId(1L);
+        pessoaRequestDTO.setLaboratorio(laboratorioDTO);
 
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
@@ -84,18 +107,26 @@ public class PessoaServiceTest {
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> pessoaService.createPessoa(pessoaDTO));
+        assertThrows(ResponseStatusException.class, () -> pessoaService.createPessoa(pessoaRequestDTO));
     }
 
     @Test
     public void testUpdatePessoa() {
-        PessoaDTO pessoaDTO = new PessoaDTO();
-        pessoaDTO.setNome("John Doe");
-        pessoaDTO.setDataInicial(LocalDateTime.now());
-        pessoaDTO.setDataFinal(LocalDateTime.now().plusDays(1));
-        pessoaDTO.setObservacoes("Observação teste");
-        pessoaDTO.setPropriedadeId(1L);
-        pessoaDTO.setLaboratorioId(1L);
+        PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
+        pessoaRequestDTO.setNome("João Silva");
+        pessoaRequestDTO.setDataInicial(LocalDateTime.now());
+        pessoaRequestDTO.setDataFinal(LocalDateTime.now().plusDays(1));
+        pessoaRequestDTO.setObservacoes("Observação teste");
+
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
+        propriedadeDTO.setId(1L);
+        propriedadeDTO.setNome("Fazenda Feliz");
+        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
+
+        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
+        laboratorioDTO.setId(1L);
+        laboratorioDTO.setNome("Laboratório Central");
+        pessoaRequestDTO.setLaboratorio(laboratorioDTO);
 
         Pessoa pessoa = new Pessoa();
         pessoa.setNome("Nome Antigo");
@@ -104,28 +135,30 @@ public class PessoaServiceTest {
 
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
+        propriedade.setNome("Fazenda Feliz");
 
         Laboratorio laboratorio = new Laboratorio();
         laboratorio.setId(1L);
+        laboratorio.setNome("Laboratório Central");
 
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.of(laboratorio));
         when(pessoaRepository.save(any(Pessoa.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Pessoa result = pessoaService.updatePessoa(1L, pessoaDTO);
+        PessoaResponseDTO result = pessoaService.updatePessoa(1L, pessoaRequestDTO);
         assertEquals("João Silva", result.getNome());
-        assertEquals(propriedade, result.getPropriedade());
-        assertEquals(laboratorio, result.getLaboratorio());
+        assertEquals(1L, result.getInfosPropriedade().getId());
+        assertEquals(1L, result.getLaboratorio().getId());
     }
 
     @Test
     public void testUpdatePessoaNotFound() {
-        PessoaDTO pessoaDTO = new PessoaDTO();
+        PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
 
         when(pessoaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> pessoaService.updatePessoa(1L, pessoaDTO));
+        assertThrows(ResponseStatusException.class, () -> pessoaService.updatePessoa(1L, pessoaRequestDTO));
     }
 
     @Test
