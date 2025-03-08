@@ -1,7 +1,9 @@
 package com.example.demo.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({"id", "nome"})
 public class PropriedadeDTO {
 
     @NotBlank(message = "O nome da propriedade é obrigatório")

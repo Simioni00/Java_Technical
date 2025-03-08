@@ -1,7 +1,9 @@
 package com.example.demo.dto;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({"id", "nome", "dataInicial", "dataFinal", "infosPropriedade", "laboratorio", "observacoes"})
 public class PessoaResponseDTO {
 
     private Long id;

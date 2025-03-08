@@ -40,10 +40,10 @@ public class PessoaService {
         pessoa.setDataFinal(pessoaRequestDTO.getDataFinal());
         pessoa.setObservacoes(pessoaRequestDTO.getObservacoes());
 
-        Propriedade propriedade = propriedadeRepository.findById(pessoaRequestDTO.getInfosPropriedade().getId())
+        Propriedade propriedade = propriedadeRepository.findById(pessoaRequestDTO.getPropriedadeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Propriedade não encontrada"));
 
-        Laboratorio laboratorio = laboratorioRepository.findById(pessoaRequestDTO.getLaboratorio().getId())
+        Laboratorio laboratorio = laboratorioRepository.findById(pessoaRequestDTO.getLaboratorioId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Laboratório não encontrado"));
 
         pessoa.setPropriedade(propriedade);
@@ -72,11 +72,12 @@ public class PessoaService {
                     pessoa.setObservacoes(pessoaRequestDTO.getObservacoes());
 
                     Propriedade propriedade = propriedadeRepository
-                            .findById(pessoaRequestDTO.getInfosPropriedade().getId())
+                            .findById(pessoaRequestDTO.getPropriedadeId())
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                     "Propriedade não encontrada"));
 
-                    Laboratorio laboratorio = laboratorioRepository.findById(pessoaRequestDTO.getLaboratorio().getId())
+                    Laboratorio laboratorio = laboratorioRepository
+                            .findById(pessoaRequestDTO.getLaboratorioId())
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                     "Laboratório não encontrado"));
 

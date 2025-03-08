@@ -17,11 +17,11 @@ public class PessoaRequestDTO {
 
     private String observacoes;
 
-    @NotNull(message = "As informações da propriedade são obrigatórias")
-    private PropriedadeDTO infosPropriedade;
+    @NotNull(message = "O ID da propriedade é obrigatório")
+    private Long propriedadeId;
 
-    @NotNull(message = "As informações do laboratório são obrigatórias")
-    private LaboratorioDTO laboratorio;
+    @NotNull(message = "O ID do laboratório é obrigatório")
+    private Long laboratorioId;
 
     public String getNome() {
         return nome;
@@ -55,19 +55,19 @@ public class PessoaRequestDTO {
         this.observacoes = observacoes;
     }
 
-    public PropriedadeDTO getInfosPropriedade() {
-        return infosPropriedade;
+    public Long getPropriedadeId() {
+        return propriedadeId;
     }
 
-    public void setInfosPropriedade(PropriedadeDTO infosPropriedade) {
-        this.infosPropriedade = infosPropriedade;
+    public void setPropriedadeId(Long propriedadeId) {
+        this.propriedadeId = propriedadeId;
     }
 
-    public LaboratorioDTO getLaboratorio() {
-        return laboratorio;
+    public Long getLaboratorioId() {
+        return laboratorioId;
     }
 
-    public void setLaboratorio(LaboratorioDTO laboratorio) {
-        this.laboratorio = laboratorio;
+    public void setLaboratorioId(Long laboratorioId) {
+        this.laboratorioId = laboratorioId;
     }
 }
