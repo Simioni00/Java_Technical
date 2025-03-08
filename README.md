@@ -38,3 +38,12 @@ Para iniciar o banco de dados usando Docker Compose, siga os passos abaixo:
     ```
 
 Certifique-se de ajustar `MYSQL_ROOT_PASSWORD=123` para a sua senha.
+
+
+### Observação: 
+
+Na hora de escolher a versão do Java fiz com a última, 23, e por conta disso algumas dependências ainda não são suportadas
+Por conta disso tive dificuldades em relação a esses testes. Sendo que para isso eles estarão prontos no momento que atualizarem
+as dependências. 
+
+Descuido meu nessa parte, mas já alertando aqueles que forem mexer no projeto. 
