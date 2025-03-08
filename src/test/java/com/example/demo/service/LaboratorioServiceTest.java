@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.LaboratorioDTO;
 import com.example.demo.dto.LaboratorioFilterDTO;
 import com.example.demo.dto.LaboratorioResponseDTO;
 import com.example.demo.entity.Laboratorio;
@@ -12,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,9 +38,9 @@ public class LaboratorioServiceTest {
         laboratorio2.setId(2L);
         laboratorio2.setNome("Laboratório 2");
 
-        when(laboratorioRepository.findAll()).thenReturn(Arrays.asList(laboratorio1, laboratorio2));
+        when(laboratorioRepository.findAll()).thenReturn(List.of(laboratorio1, laboratorio2));
 
-        List<Laboratorio> result = laboratorioService.getAllLaboratorios();
+        List<LaboratorioResponseDTO> result = laboratorioService.getAllLaboratorios();
         assertEquals(2, result.size());
         assertEquals("Laboratório 1", result.get(0).getNome());
         assertEquals("Laboratório 2", result.get(1).getNome());
@@ -54,48 +54,58 @@ public class LaboratorioServiceTest {
 
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.of(laboratorio));
 
-        Optional<Laboratorio> result = laboratorioService.getLaboratorioById(1L);
-        assertTrue(result.isPresent());
-        assertEquals("Laboratório 1", result.get().getNome());
+        LaboratorioResponseDTO result = laboratorioService.getLaboratorioById(1L);
+        assertNotNull(result);
+        assertEquals("Laboratório 1", result.getNome());
     }
 
     @Test
     public void testGetLaboratorioByIdNotFound() {
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<Laboratorio> result = laboratorioService.getLaboratorioById(1L);
-        assertFalse(result.isPresent());
+        assertThrows(ResponseStatusException.class, () -> laboratorioService.getLaboratorioById(1L));
     }
 
     @Test
     public void testCreateLaboratorio() {
+        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
+        laboratorioDTO.setNome("Laboratório 1");
+
         Laboratorio laboratorio = new Laboratorio();
-        laboratorio.setNome("Laboratório 1");
+        laboratorio.setNome(laboratorioDTO.getNome());
 
-        when(laboratorioRepository.save(laboratorio)).thenReturn(laboratorio);
+        when(laboratorioRepository.save(any(Laboratorio.class))).thenReturn(laboratorio);
 
-        Laboratorio result = laboratorioService.createLaboratorio(laboratorio);
+        LaboratorioResponseDTO result = laboratorioService.createLaboratorio(laboratorioDTO);
+        assertNotNull(result);
         assertEquals("Laboratório 1", result.getNome());
     }
 
     @Test
     public void testUpdateLaboratorio() {
+        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
+        laboratorioDTO.setNome("Laboratório Atualizado");
+
         Laboratorio laboratorio = new Laboratorio();
         laboratorio.setId(1L);
         laboratorio.setNome("Laboratório 1");
 
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.of(laboratorio));
-        when(laboratorioRepository.save(laboratorio)).thenReturn(laboratorio);
+        when(laboratorioRepository.save(any(Laboratorio.class))).thenReturn(laboratorio);
 
-        Laboratorio result = laboratorioService.updateLaboratorio(1L, laboratorio);
-        assertEquals("Laboratório 1", result.getNome());
+        LaboratorioResponseDTO result = laboratorioService.updateLaboratorio(1L, laboratorioDTO);
+        assertNotNull(result);
+        assertEquals("Laboratório Atualizado", result.getNome());
     }
 
     @Test
     public void testUpdateLaboratorioNotFound() {
+        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
+        laboratorioDTO.setNome("Laboratório Atualizado");
+
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> laboratorioService.updateLaboratorio(1L, new Laboratorio()));
+        assertThrows(ResponseStatusException.class, () -> laboratorioService.updateLaboratorio(1L, laboratorioDTO));
     }
 
     @Test

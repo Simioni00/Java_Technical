@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.LaboratorioDTO;
-import com.example.demo.dto.PessoaDTO;
 import com.example.demo.dto.PessoaProjectionDTO;
 import com.example.demo.dto.PessoaRequestDTO;
 import com.example.demo.dto.PessoaResponseDTO;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -106,12 +104,10 @@ public class PessoaService {
         responseDTO.setObservacoes(pessoa.getObservacoes());
 
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
-    //    propriedadeDTO.setId(pessoa.getPropriedade().getId());
         propriedadeDTO.setNome(pessoa.getPropriedade().getNome());
         responseDTO.setInfosPropriedade(propriedadeDTO);
 
         LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
-        laboratorioDTO.setId(pessoa.getLaboratorio().getId());
         laboratorioDTO.setNome(pessoa.getLaboratorio().getNome());
         responseDTO.setLaboratorio(laboratorioDTO);
 

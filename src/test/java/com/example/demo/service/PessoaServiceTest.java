@@ -41,22 +41,16 @@ public class PessoaServiceTest {
 
     @Test
     public void testCreatePessoa() {
+        // Criação do DTO de entrada
         PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
         pessoaRequestDTO.setNome("João Silva");
         pessoaRequestDTO.setDataInicial(LocalDateTime.now());
         pessoaRequestDTO.setDataFinal(LocalDateTime.now().plusDays(1));
         pessoaRequestDTO.setObservacoes("Observação teste");
+        pessoaRequestDTO.setPropriedadeId(1L);
+        pessoaRequestDTO.setLaboratorioId(1L);
 
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
-        propriedadeDTO.setId(1L);
-        propriedadeDTO.setNome("Fazenda Feliz");
-        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
-
-        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
-        laboratorioDTO.setId(1L);
-        laboratorioDTO.setNome("Laboratório Central");
-        pessoaRequestDTO.setLaboratorio(laboratorioDTO);
-
+        // Mocks das entidades relacionadas
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
         propriedade.setNome("Fazenda Feliz");
@@ -65,6 +59,7 @@ public class PessoaServiceTest {
         laboratorio.setId(1L);
         laboratorio.setNome("Laboratório Central");
 
+        // Configuração dos mocks
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.of(laboratorio));
         when(pessoaRepository.save(any(Pessoa.class))).thenAnswer(invocation -> {
@@ -72,67 +67,62 @@ public class PessoaServiceTest {
             return pessoa;
         });
 
+        // Execução do método
         PessoaResponseDTO result = pessoaService.createPessoa(pessoaRequestDTO);
+
+        // Verificações
+        assertNotNull(result);
         assertEquals("João Silva", result.getNome());
         assertEquals(1L, result.getInfosPropriedade().getId());
+        assertEquals("Fazenda Feliz", result.getInfosPropriedade().getNome());
         assertEquals(1L, result.getLaboratorio().getId());
+        assertEquals("Laboratório Central", result.getLaboratorio().getNome());
     }
 
     @Test
     public void testCreatePessoaPropriedadeNotFound() {
+        // Criação do DTO de entrada
         PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
-        propriedadeDTO.setId(1L);
-        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
+        pessoaRequestDTO.setPropriedadeId(1L);
 
+        // Configuração do mock para propriedade não encontrada
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.empty());
 
+        // Verificação da exceção
         assertThrows(ResponseStatusException.class, () -> pessoaService.createPessoa(pessoaRequestDTO));
     }
 
     @Test
     public void testCreatePessoaLaboratorioNotFound() {
+        // Criação do DTO de entrada
         PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
-        propriedadeDTO.setId(1L);
-        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
+        pessoaRequestDTO.setPropriedadeId(1L);
+        pessoaRequestDTO.setLaboratorioId(1L);
 
-        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
-        laboratorioDTO.setId(1L);
-        pessoaRequestDTO.setLaboratorio(laboratorioDTO);
-
+        // Mocks
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
 
+        // Configuração dos mocks
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.empty());
 
+        // Verificação da exceção
         assertThrows(ResponseStatusException.class, () -> pessoaService.createPessoa(pessoaRequestDTO));
     }
 
     @Test
     public void testUpdatePessoa() {
+        // Criação do DTO de entrada
         PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
         pessoaRequestDTO.setNome("João Silva");
         pessoaRequestDTO.setDataInicial(LocalDateTime.now());
         pessoaRequestDTO.setDataFinal(LocalDateTime.now().plusDays(1));
         pessoaRequestDTO.setObservacoes("Observação teste");
+        pessoaRequestDTO.setPropriedadeId(1L);
+        pessoaRequestDTO.setLaboratorioId(1L);
 
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO();
-        propriedadeDTO.setId(1L);
-        propriedadeDTO.setNome("Fazenda Feliz");
-        pessoaRequestDTO.setInfosPropriedade(propriedadeDTO);
-
-        LaboratorioDTO laboratorioDTO = new LaboratorioDTO();
-        laboratorioDTO.setId(1L);
-        laboratorioDTO.setNome("Laboratório Central");
-        pessoaRequestDTO.setLaboratorio(laboratorioDTO);
-
-        Pessoa pessoa = new Pessoa();
-        pessoa.setNome("Nome Antigo");
-        pessoa.setDataInicial(LocalDateTime.now().minusDays(1));
-        pessoa.setDataFinal(LocalDateTime.now());
-
+        // Mocks das entidades relacionadas
         Propriedade propriedade = new Propriedade();
         propriedade.setId(1L);
         propriedade.setNome("Fazenda Feliz");
@@ -141,36 +131,60 @@ public class PessoaServiceTest {
         laboratorio.setId(1L);
         laboratorio.setNome("Laboratório Central");
 
-        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
+        Pessoa pessoaExistente = new Pessoa();
+        pessoaExistente.setId(1L);
+        pessoaExistente.setNome("Nome Antigo");
+        pessoaExistente.setDataInicial(LocalDateTime.now().minusDays(1));
+        pessoaExistente.setDataFinal(LocalDateTime.now());
+
+        // Configuração dos mocks
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoaExistente));
         when(propriedadeRepository.findById(1L)).thenReturn(Optional.of(propriedade));
         when(laboratorioRepository.findById(1L)).thenReturn(Optional.of(laboratorio));
         when(pessoaRepository.save(any(Pessoa.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
+        // Execução do método
         PessoaResponseDTO result = pessoaService.updatePessoa(1L, pessoaRequestDTO);
+
+        // Verificações
+        assertNotNull(result);
         assertEquals("João Silva", result.getNome());
         assertEquals(1L, result.getInfosPropriedade().getId());
+        assertEquals("Fazenda Feliz", result.getInfosPropriedade().getNome());
         assertEquals(1L, result.getLaboratorio().getId());
+        assertEquals("Laboratório Central", result.getLaboratorio().getNome());
     }
 
     @Test
     public void testUpdatePessoaNotFound() {
+        // Criação do DTO de entrada
         PessoaRequestDTO pessoaRequestDTO = new PessoaRequestDTO();
 
+        // Configuração do mock para pessoa não encontrada
         when(pessoaRepository.findById(1L)).thenReturn(Optional.empty());
 
+        // Verificação da exceção
         assertThrows(ResponseStatusException.class, () -> pessoaService.updatePessoa(1L, pessoaRequestDTO));
     }
 
     @Test
     public void testDeletePessoa() {
+        // Configuração do mock para pessoa existente
         when(pessoaRepository.existsById(1L)).thenReturn(true);
+
+        // Execução do método
         pessoaService.deletePessoa(1L);
+
+        // Verificação da exclusão
         verify(pessoaRepository, times(1)).deleteById(1L);
     }
 
     @Test
     public void testDeletePessoaNotFound() {
+        // Configuração do mock para pessoa não encontrada
         when(pessoaRepository.existsById(1L)).thenReturn(false);
+
+        // Verificação da exceção
         assertThrows(ResponseStatusException.class, () -> pessoaService.deletePessoa(1L));
     }
 }*/

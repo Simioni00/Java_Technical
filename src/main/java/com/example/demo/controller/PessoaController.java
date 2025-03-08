@@ -1,10 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.PessoaDTO;
 import com.example.demo.dto.PessoaProjectionDTO;
 import com.example.demo.dto.PessoaRequestDTO;
 import com.example.demo.dto.PessoaResponseDTO;
-import com.example.demo.entity.Pessoa;
 import com.example.demo.service.PessoaService;
 
 import jakarta.validation.Valid;

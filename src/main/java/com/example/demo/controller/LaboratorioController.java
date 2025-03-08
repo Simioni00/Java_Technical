@@ -1,12 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.LaboratorioDTO;
 import com.example.demo.dto.LaboratorioFilterDTO;
 import com.example.demo.dto.LaboratorioResponseDTO;
-import com.example.demo.entity.Laboratorio;
 import com.example.demo.service.LaboratorioService;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,29 +21,28 @@ public class LaboratorioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Laboratorio>> getAllLaboratorios() {
-        List<Laboratorio> laboratorios = laboratorioService.getAllLaboratorios();
+    public ResponseEntity<List<LaboratorioResponseDTO>> getAllLaboratorios() {
+        List<LaboratorioResponseDTO> laboratorios = laboratorioService.getAllLaboratorios();
         return ResponseEntity.ok(laboratorios);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Laboratorio> getLaboratorioById(@PathVariable Long id) {
-        return laboratorioService.getLaboratorioById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<LaboratorioResponseDTO> getLaboratorioById(@PathVariable Long id) {
+        LaboratorioResponseDTO laboratorio = laboratorioService.getLaboratorioById(id);
+        return ResponseEntity.ok(laboratorio);
     }
 
     @PostMapping
-    public ResponseEntity<Laboratorio> createLaboratorio(@Valid @RequestBody Laboratorio laboratorio) {
-        Laboratorio createdLaboratorio = laboratorioService.createLaboratorio(laboratorio);
+    public ResponseEntity<LaboratorioResponseDTO> createLaboratorio(@Valid @RequestBody LaboratorioDTO laboratorioDTO) {
+        LaboratorioResponseDTO createdLaboratorio = laboratorioService.createLaboratorio(laboratorioDTO);
         return ResponseEntity.ok(createdLaboratorio);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Laboratorio> updateLaboratorio(@PathVariable Long id,
-            @Valid @RequestBody Laboratorio laboratorio) {
-        Laboratorio updatedLaboratorio = laboratorioService.updateLaboratorio(id, laboratorio);
-        return updatedLaboratorio != null ? ResponseEntity.ok(updatedLaboratorio) : ResponseEntity.notFound().build();
+    public ResponseEntity<LaboratorioResponseDTO> updateLaboratorio(@PathVariable Long id,
+            @Valid @RequestBody LaboratorioDTO laboratorioDTO) {
+        LaboratorioResponseDTO updatedLaboratorio = laboratorioService.updateLaboratorio(id, laboratorioDTO);
+        return ResponseEntity.ok(updatedLaboratorio);
     }
 
     @DeleteMapping("/{id}")
@@ -55,7 +52,8 @@ public class LaboratorioController {
     }
 
     @GetMapping("/filtros")
-    public ResponseEntity<List<LaboratorioResponseDTO>> getLaboratoriosComFiltros(@ModelAttribute LaboratorioFilterDTO filtros) {
+    public ResponseEntity<List<LaboratorioResponseDTO>> getLaboratoriosComFiltros(
+            @ModelAttribute LaboratorioFilterDTO filtros) {
         List<LaboratorioResponseDTO> laboratorios = laboratorioService.findLaboratoriosComFiltros(filtros);
         return ResponseEntity.ok(laboratorios);
     }

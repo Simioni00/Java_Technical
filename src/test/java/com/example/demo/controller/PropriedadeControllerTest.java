@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.PropriedadeDTO;
 import com.example.demo.dto.PropriedadeResponseDTO;
-import com.example.demo.entity.Propriedade;
 import com.example.demo.service.PropriedadeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

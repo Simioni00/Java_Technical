@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.LaboratorioDTO;
 import com.example.demo.dto.LaboratorioFilterDTO;
 import com.example.demo.dto.LaboratorioResponseDTO;
 import com.example.demo.entity.Laboratorio;
@@ -10,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LaboratorioService {
@@ -21,25 +22,38 @@ public class LaboratorioService {
         this.laboratorioRepository = laboratorioRepository;
     }
 
-    public List<Laboratorio> getAllLaboratorios() {
-        return laboratorioRepository.findAll();
+    public List<LaboratorioResponseDTO> getAllLaboratorios() {
+        return laboratorioRepository.findAll().stream()
+                .map(laboratorio -> new LaboratorioResponseDTO(laboratorio.getId(), laboratorio.getNome(),
+                        (long) laboratorio.getPessoas().size()))
+                .collect(Collectors.toList());
     }
 
-    public Optional<Laboratorio> getLaboratorioById(Long id) {
-        return laboratorioRepository.findById(id);
-    }
-
-    public Laboratorio createLaboratorio(Laboratorio laboratorio) {
-        return laboratorioRepository.save(laboratorio);
-    }
-
-    public Laboratorio updateLaboratorio(Long id, Laboratorio laboratorioDetails) {
-        return laboratorioRepository.findById(id)
-                .map(laboratorio -> {
-                    laboratorio.setNome(laboratorioDetails.getNome());
-                    return laboratorioRepository.save(laboratorio);
-                })
+    public LaboratorioResponseDTO getLaboratorioById(Long id) {
+        Laboratorio laboratorio = laboratorioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Laboratório não encontrado"));
+        return new LaboratorioResponseDTO(laboratorio.getId(), laboratorio.getNome(),
+                (long) laboratorio.getPessoas().size());
+    }
+
+    public LaboratorioResponseDTO createLaboratorio(LaboratorioDTO laboratorioDTO) {
+        Laboratorio laboratorio = new Laboratorio();
+        laboratorio.setNome(laboratorioDTO.getNome());
+
+        Laboratorio savedLaboratorio = laboratorioRepository.save(laboratorio);
+        return new LaboratorioResponseDTO(savedLaboratorio.getId(), savedLaboratorio.getNome(),
+                (long) savedLaboratorio.getPessoas().size());
+    }
+
+    public LaboratorioResponseDTO updateLaboratorio(Long id, LaboratorioDTO laboratorioDTO) {
+        Laboratorio laboratorio = laboratorioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Laboratório não encontrado"));
+
+        laboratorio.setNome(laboratorioDTO.getNome());
+        Laboratorio updatedLaboratorio = laboratorioRepository.save(laboratorio);
+
+        return new LaboratorioResponseDTO(updatedLaboratorio.getId(), updatedLaboratorio.getNome(),
+                (long) updatedLaboratorio.getPessoas().size());
     }
 
     public void deleteLaboratorio(Long id) {
@@ -57,7 +71,7 @@ public class LaboratorioService {
                 filtros.getDataFinalEnd(),
                 filtros.getObservacoes(),
                 filtros.getQuantidadeMinimaPessoas());
-        
+
         return laboratorios != null ? laboratorios : Collections.emptyList();
     }
 }
