@@ -4,6 +4,7 @@ import com.example.demo.entity.Pessoa;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -14,39 +15,57 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PessoaRepositoryTest {
 
     @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
     private PessoaRepository pessoaRepository;
-
-    @Test
-    public void testSavePessoa() {
-        Pessoa pessoa = new Pessoa();
-        pessoa.setNome("John Doe");
-        pessoa.setDataInicial(LocalDateTime.now());
-        pessoa.setDataFinal(LocalDateTime.now().plusDays(1));
-
-        Pessoa savedPessoa = pessoaRepository.save(pessoa);
-        assertNotNull(savedPessoa.getId());
-        assertEquals("John Doe", savedPessoa.getNome());
-    }
 
     @Test
     public void testFindById() {
         Pessoa pessoa = new Pessoa();
-        pessoa.setNome("John Doe");
-        pessoaRepository.save(pessoa);
+        pessoa.setNome("João");
+        pessoa.setDataInicial(LocalDateTime.now());
+        pessoa.setDataFinal(LocalDateTime.now().plusDays(1));
+        entityManager.persist(pessoa);
+        entityManager.flush();
 
-        Optional<Pessoa> foundPessoa = pessoaRepository.findById(pessoa.getId());
-        assertTrue(foundPessoa.isPresent());
-        assertEquals("John Doe", foundPessoa.get().getNome());
+        Optional<Pessoa> found = pessoaRepository.findById(pessoa.getId());
+
+        assertTrue(found.isPresent());
+        assertEquals("João", found.get().getNome());
+    }
+
+    @Test
+    public void testFindByIdNotFound() {
+        Optional<Pessoa> found = pessoaRepository.findById(999L);
+        assertFalse(found.isPresent());
+    }
+
+    @Test
+    public void testSavePessoa() {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setNome("Maria");
+        pessoa.setDataInicial(LocalDateTime.now());
+        pessoa.setDataFinal(LocalDateTime.now().plusDays(1));
+
+        Pessoa saved = pessoaRepository.save(pessoa);
+
+        assertNotNull(saved.getId());
+        assertEquals("Maria", saved.getNome());
     }
 
     @Test
     public void testDeletePessoa() {
         Pessoa pessoa = new Pessoa();
-        pessoa.setNome("John Doe");
-        pessoaRepository.save(pessoa);
+        pessoa.setNome("Carlos");
+        pessoa.setDataInicial(LocalDateTime.now());
+        pessoa.setDataFinal(LocalDateTime.now().plusDays(1));
+        entityManager.persist(pessoa);
+        entityManager.flush();
 
         pessoaRepository.deleteById(pessoa.getId());
-        Optional<Pessoa> deletedPessoa = pessoaRepository.findById(pessoa.getId());
-        assertFalse(deletedPessoa.isPresent());
+
+        Optional<Pessoa> found = pessoaRepository.findById(pessoa.getId());
+        assertFalse(found.isPresent());
     }
 }

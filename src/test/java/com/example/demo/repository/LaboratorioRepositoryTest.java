@@ -4,6 +4,7 @@ import com.example.demo.entity.Laboratorio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Optional;
 
@@ -13,37 +14,56 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LaboratorioRepositoryTest {
 
     @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
     private LaboratorioRepository laboratorioRepository;
 
     @Test
-    public void testSaveLaboratorio() {
+    public void testFindById() {
+
         Laboratorio laboratorio = new Laboratorio();
         laboratorio.setNome("Laboratório 1");
+        entityManager.persist(laboratorio);
+        entityManager.flush();
 
-        Laboratorio savedLaboratorio = laboratorioRepository.save(laboratorio);
-        assertNotNull(savedLaboratorio.getId());
-        assertEquals("Laboratório 1", savedLaboratorio.getNome());
+        Optional<Laboratorio> found = laboratorioRepository.findById(laboratorio.getId());
+
+        assertTrue(found.isPresent());
+        assertEquals(laboratorio.getNome(), found.get().getNome());
     }
 
     @Test
-    public void testFindById() {
-        Laboratorio laboratorio = new Laboratorio();
-        laboratorio.setNome("Laboratório 1");
-        laboratorioRepository.save(laboratorio);
+    public void testFindByIdNotFound() {
 
-        Optional<Laboratorio> foundLaboratorio = laboratorioRepository.findById(laboratorio.getId());
-        assertTrue(foundLaboratorio.isPresent());
-        assertEquals("Laboratório 1", foundLaboratorio.get().getNome());
+        Optional<Laboratorio> found = laboratorioRepository.findById(999L);
+
+        assertFalse(found.isPresent());
+    }
+
+    @Test
+    public void testSaveLaboratorio() {
+
+        Laboratorio laboratorio = new Laboratorio();
+        laboratorio.setNome("Laboratório 2");
+
+        Laboratorio saved = laboratorioRepository.save(laboratorio);
+
+        assertNotNull(saved.getId());
+        assertEquals(laboratorio.getNome(), saved.getNome());
     }
 
     @Test
     public void testDeleteLaboratorio() {
+
         Laboratorio laboratorio = new Laboratorio();
-        laboratorio.setNome("Laboratório 1");
-        laboratorioRepository.save(laboratorio);
+        laboratorio.setNome("Laboratório 3");
+        entityManager.persist(laboratorio);
+        entityManager.flush();
 
         laboratorioRepository.deleteById(laboratorio.getId());
-        Optional<Laboratorio> deletedLaboratorio = laboratorioRepository.findById(laboratorio.getId());
-        assertFalse(deletedLaboratorio.isPresent());
+
+        Optional<Laboratorio> found = laboratorioRepository.findById(laboratorio.getId());
+        assertFalse(found.isPresent());
     }
 }

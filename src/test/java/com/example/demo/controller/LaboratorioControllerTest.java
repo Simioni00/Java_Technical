@@ -1,20 +1,25 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.LaboratorioDTO;
 import com.example.demo.dto.LaboratorioResponseDTO;
 import com.example.demo.service.LaboratorioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 
 @WebMvcTest(LaboratorioController.class)
 public class LaboratorioControllerTest {
@@ -22,8 +27,16 @@ public class LaboratorioControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private LaboratorioService laboratorioService;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
 
     @Test
     public void testGetLaboratorioById() throws Exception {
@@ -78,5 +91,42 @@ public class LaboratorioControllerTest {
     public void testDeleteLaboratorio() throws Exception {
         mockMvc.perform(delete("/laboratorios/1"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testCreateLaboratorioWithInvalidData() throws Exception {
+        LaboratorioDTO invalidLaboratorioDTO = new LaboratorioDTO();
+        invalidLaboratorioDTO.setNome("");
+
+        mockMvc.perform(post("/laboratorios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(invalidLaboratorioDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateLaboratorioWithInvalidData() throws Exception {
+        LaboratorioDTO invalidLaboratorioDTO = new LaboratorioDTO();
+        invalidLaboratorioDTO.setNome("");
+
+        mockMvc.perform(put("/laboratorios/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(invalidLaboratorioDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testGetAllLaboratorios() throws Exception {
+        LaboratorioResponseDTO responseDTO1 = new LaboratorioResponseDTO(1L, "Laboratório 1", 0L);
+        LaboratorioResponseDTO responseDTO2 = new LaboratorioResponseDTO(2L, "Laboratório 2", 0L);
+
+        when(laboratorioService.getAllLaboratorios()).thenReturn(List.of(responseDTO1, responseDTO2));
+
+        mockMvc.perform(get("/laboratorios"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].nome").value("Laboratório 1"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].nome").value("Laboratório 2"));
     }
 }
